@@ -11,6 +11,19 @@ function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <div className="hero min-h-screen bg-base-200">
+        <div className="hero-content text-center">
+          <div className="max-w-md">
+            <h1 className="text-5xl font-bold">
+              Page the code author will visit when he first logs in
+            </h1>
+            <p className="py-6">
+              Here, he will see the code snippets that he/she has
+            </p>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
