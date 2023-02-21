@@ -12,8 +12,6 @@ type Inputs = {
 };
 
 const RegisterPage = () => {
-  const [loading, setLoading] = useState(false);
-
   const {
     register,
     handleSubmit,
@@ -21,25 +19,19 @@ const RegisterPage = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+  const onSubmit: SubmitHandler<Inputs> = async (formData, e) => {
+    e.preventDefault();
+
     try {
-      console.log(formData);
-      setLoading(true);
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            username: formData.username,
-          },
-        },
       });
-      console.log(data);
-      setLoading(false);
+
+      if (error) throw error;
+      alert("Check your email for verification link");
     } catch (error) {
-      console.log(error);
+      alert(error);
     }
   };
 
