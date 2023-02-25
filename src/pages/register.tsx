@@ -1,39 +1,60 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { supabase } from "../common/utils/supabaseClient";
 import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-type Inputs = {
-  firstName: String;
-  lastName: String;
-  username: String;
-  email: String;
-  password: String;
-  confirmPassword: String;
-};
+const formSchema = z.object({
+  firstName: z.string().min(1, "Your first name is required."),
+  lastName: z.string().min(1, "Your last name is required."),
+  username: z
+    .string()
+    .min(5, { message: "Must be at least 5 characters long!" }),
+  email: z.string().email().min(2),
+  password: z.string().min(8),
+  confirmPassword: z.string().min(8),
+});
+
+type formValues = z.infer<typeof formSchema>;
 
 const RegisterPage = () => {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm<formValues>({
+    resolver: zodResolver(formSchema),
+  });
 
-  const onSubmit: SubmitHandler<Inputs> = async (formData, e) => {
-    e.preventDefault();
+  const onSubmit: SubmitHandler<formValues> = async (formData, e) => {
+    e?.preventDefault();
+    /* if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            username: formData.username,
+          },
+        },
       });
 
       if (error) throw error;
       alert("Check your email for verification link");
     } catch (error) {
       alert(error);
-    }
+    } */
+    console.log("register user request sent!");
   };
+
+  console.log(errors);
 
   return (
     <div className="hero min-h-screen bg-base-200">
@@ -51,16 +72,23 @@ const RegisterPage = () => {
         >
           <div className="card-body">
             {/* Username Field */}
-            <div className="form-control">
+            <div className="form-control w-full max-w-xs">
               <label className="label">
                 <span className="label-text">Username</span>
               </label>
               <input
                 type="text"
-                placeholder="Username"
-                className="input input-bordered"
-                {...register("username")}
+                placeholder="Type here"
+                className={`input w-full max-w-xs input-bordered`}
+                {...register("username", { required: true })}
               />
+              {errors?.username?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.username?.message}
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* First Name Field */}
@@ -72,8 +100,15 @@ const RegisterPage = () => {
                 type="text"
                 placeholder="First Name"
                 className="input input-bordered"
-                {...register("firstName")}
+                {...register("firstName", { required: true })}
               />
+              {errors?.firstName?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.firstName?.message}
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* Last Name Field */}
@@ -85,8 +120,15 @@ const RegisterPage = () => {
                 type="text"
                 placeholder="Last Name"
                 className="input input-bordered"
-                {...register("lastName")}
+                {...register("lastName", { required: true })}
               />
+              {errors?.lastName?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.lastName?.message}
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* Last Name Field */}
@@ -95,11 +137,18 @@ const RegisterPage = () => {
                 <span className="label-text">Email</span>
               </label>
               <input
-                type="text"
+                type="email"
                 placeholder="Email"
                 className="input input-bordered"
-                {...register("email")}
+                {...register("email", { required: true })}
               />
+              {errors?.email?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.email?.message}
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* Password Field */}
@@ -111,8 +160,15 @@ const RegisterPage = () => {
                 type="Password"
                 placeholder="Password"
                 className="input input-bordered"
-                {...register("password")}
+                {...register("password", { required: true })}
               />
+              {errors?.password?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.password?.message}
+                  </span>
+                </label>
+              )}
             </div>
 
             {/* Password Field */}
@@ -124,9 +180,20 @@ const RegisterPage = () => {
                 type="Password"
                 placeholder="Re-enter password"
                 className="input input-bordered"
-                {...register("confirmPassword")}
+                {...register("confirmPassword", {
+                  required: true,
+                })}
               />
+              {errors?.confirmPassword?.message !== null && (
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {errors?.confirmPassword?.message}
+                  </span>
+                </label>
+              )}
             </div>
+
+            {/* demo input to show what the error looks like */}
 
             {/* Button to trigger login */}
             <div className="form-control mt-6">
